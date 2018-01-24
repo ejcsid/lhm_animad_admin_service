@@ -3,12 +3,15 @@
 <link rel="import" href="../../bower_components/iron-meta/iron-meta.html">
 <link rel="import" href="../animad-icons.html">
 
+<link rel="import" href="../behaviors/animad-form-behavior.html">
+<link rel="import" href="../behaviors/mixin.html">
+
 <dom-module id="common-security-init">
     <template>
         <style>
         </style>
 
-        <iron-ajax
+<!--        <iron-ajax
             auto
             url="[[permissionsUrl]]"
             id="perms"
@@ -16,7 +19,7 @@
             last-response="{{_permissions}}"
             on-response="_setPermissions"
             >
-        </iron-ajax>    
+        </iron-ajax>    -->
 
     </template>
     <script>
@@ -29,7 +32,7 @@
          * @polymer
          *
          */
-        class CommonSecurityInit extends Polymer.Element {
+        class CommonSecurityInit extends mix(Polymer.Element).with(AnimadFormBehavior) {
 
             static get is() {
                 return 'common-security-init';
@@ -49,7 +52,14 @@
                         type: Object,
                         value: [],
                         notify: true
-                    }
+                    },
+                    //inherited from AnimadFormBehaviour (kann man auch ohne das einen 
+                    //observer registrieren?
+                    data: {
+                        type: Object,
+                        notify: true,
+                        observer: '_dataUpdate'
+                    },
                 }
             }
 
@@ -62,7 +72,6 @@
 //                this._fetchPermissionsSynchronously();
 
             }
-
 
             // methods
 
@@ -98,6 +107,12 @@
 
             _changed() {
                 console.log('changed!');
+            }
+            
+            _dataUpdate() {
+                console.log('data updated: ' + this.data._embedded.permissions);
+                this._permissions = this.data._embedded.permissions;
+                this._setPermissions();
             }
 
         }
