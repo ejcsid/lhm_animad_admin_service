@@ -7,21 +7,6 @@
 <link rel="import" href="../behaviors/mixin.html">
 
 <dom-module id="common-security-init">
-    <template>
-        <style>
-        </style>
-
-<!--        <iron-ajax
-            auto
-            url="[[permissionsUrl]]"
-            id="perms"
-            handle-as="json"
-            last-response="{{_permissions}}"
-            on-response="_setPermissions"
-            >
-        </iron-ajax>    -->
-
-    </template>
     <script>
         /**
          * # Element zum initialen Abrufen der Rechte des aktuellen Users.
@@ -58,7 +43,7 @@
                     data: {
                         type: Object,
                         notify: true,
-                        observer: '_dataUpdate'
+                        observer: '_dataUpdated'
                     },
                 }
             }
@@ -69,7 +54,6 @@
 
             connectedCallback() {
                 super.connectedCallback();
-//                this._fetchPermissionsSynchronously();
 
             }
 
@@ -88,31 +72,15 @@
                 return this._permissions;
             }
 
-            _setPermissions() {
-                console.log('setPermissions called');
-                window.dispatchEvent(new CustomEvent('permissionsReceived', {detail: {kicked: true}}));
-            }
-
-            _fetchPermissionsSynchronously() {
-                var url = permissionsUrl;
-                var request = new XMLHttpRequest();
-                request.open('GET', url, false);  // `false` makes the request synchronous
-                request.send(null);
-
-                if (request.status === 200) {
-                    console.log(request.responseText);
-                    this._permissions = JSON.parse(request.responseText);
-                }
-            }
 
             _changed() {
                 console.log('changed!');
             }
             
-            _dataUpdate() {
+            _dataUpdated() {
                 console.log('data updated: ' + this.data._embedded.permissions);
                 this._permissions = this.data._embedded.permissions;
-                this._setPermissions();
+                window.dispatchEvent(new CustomEvent('permissionsReceived', {detail: {kicked: true}}));
             }
 
         }
